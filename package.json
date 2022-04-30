@@ -1,0 +1,26 @@
+{
+  "name": "auth",
+  "version": "1.0.0",
+  "description": "The authentication platform for all systems",
+  "main": "index.js",
+  "scripts": {
+    "auth": "node server.js",
+    "test": "jest"
+  },
+  "keywords": [
+    "Authentication"
+  ],
+  "author": "Matt Cole",
+  "license": "ISC",
+  "dependencies": {
+    "bunyan": "^1.8.15",
+    "convict": "^6.2.2",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "moment": "^2.29.3",
+    "mongodb": "^4.5.0",
+    "morgan": "^1.10.0",
+    "supertest": "^6.2.2"
+  }
+}
