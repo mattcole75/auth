@@ -10,7 +10,7 @@ const crypto = require('crypto');
 const config = require('../../configuration/config');
 const version = config.get('version');
 const validate = require('../../validation/validate');
-const { postUserRules, postLoginRules, getUserRules, postLogoutRules, getTokenRules, patchUserDisplayNameRules, patchUserEmailRules, patchUserPasswordRules } = require('../../validation/rules');
+const { postUserRules, postLoginRules, getUserRules, postLogoutRules, getTokenRules, patchUserDisplayNameRules, patchUserEmailRules, patchUserPasswordRules, testTokenRules } = require('../../validation/rules');
 const moment = require('moment');
 const { genHash, genToken } = require('../../utility/auth');
 
@@ -231,6 +231,31 @@ const patchUserPassword = (req, next) => {
     }
 }
 
+const testToken = (req, next) => {
+
+    let errors = [];
+    if(req.headers.idtoken && req.headers.idtoken != null) {
+        errors = validate(req.headers, testTokenRules);
+    } else {
+        log.error(`POST v${version} - validation failure - testToken - status: 400, msg: request header parameters missing`);
+        return next({status: 400, msg: 'Bad request - validation failure'}, null);
+    }
+    
+    if(errors.length > 0) {
+        log.error(`POST v${version} - validation failure - testToken - status: 400, msg: ${errors}`);
+        next({status: 400, msg: 'Bad request - validation failure'}, null);
+    } else {
+        auth.testToken(req.headers, (err, res) => {
+            if(err) {
+                log.error(`POST v${version} - failed - testToken - status: ${err.status} msg: ${err.msg}`);
+                next(err, null);
+            } else {
+                next(null, res);
+            }
+        });
+    }
+}
+
 module.exports = {
     postUser: postUser,
     login: login,
@@ -239,5 +264,6 @@ module.exports = {
     isAuthenticated: isAuthenticated,
     patchUserDisplayName: patchUserDisplayName,
     patchUserEmail: patchUserEmail,
-    patchUserPassword: patchUserPassword
+    patchUserPassword: patchUserPassword,
+    testToken: testToken
 }

@@ -464,3 +464,89 @@ describe('Test the user input validators', () => {
     });
 
 });
+
+// auth token tests
+describe('Test token authentication', () => {
+
+    it('should, return 404 for a non-existing', async() => {
+        await endPoint.post('/authenticate')
+            .set({
+                idToken: wrongToken
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(404)
+    });
+
+    it('should, return 400 for an empty string token', async() => {
+        await endPoint.post('/authenticate')
+            .set({
+                idToken: ''
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(400)
+    });
+
+    it('should, return 400 for no token', async() => {
+        await endPoint.post('/authenticate')
+            .set({
+            
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(400)
+    });
+
+    it('login test A', async done => {
+        await endPoint.post('/user/login')
+            .send({
+                email: 'testa@phobos.com',
+                password: crypto.createHash('sha256').update('letmein1').digest('hex')
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => {
+                expect(res.body).toBeDefined();
+                expect(res.body.status).toBe(200);
+                expect(res.body.user.displayName).toBe('Test A');
+                expect(res.body.user.email).toBe('testa@phobos.com');
+                expect(res.body.user.idToken).toHaveLength(256);
+                localId2 = res.body.user.localId;
+                idToken2 = res.body.user.idToken;
+                done();
+            })
+    });
+
+    it('should, return 200 for a valid token', async() => {
+        await endPoint.post('/authenticate')
+            .set({
+                idToken: idToken2
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+    });
+
+    it('should, logout the user given the user id', async() => {
+        await endPoint.post('/user/logout')
+            .set({
+                idToken: idToken2,
+                localId: localId2
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+    });
+
+    it('should, return 404 for a logged out user', async() => {
+        await endPoint.post('/authenticate')
+            .set({
+                idToken: idToken2
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(404)
+    });
+});

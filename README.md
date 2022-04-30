@@ -3,7 +3,7 @@ Node Express MongoDB api for managing user authentication.
 
 ## Installation
 
-Use the package manager [npm](https://pip.pypa.io/en/stable/) to install Auth once you have cloned the repository.
+Use the package manager [npm](https://github.com/mattcole75/auth) to install Auth once you have cloned the repository.
 
 ```bash
 npm install
@@ -11,7 +11,7 @@ npm install
 ## Configuration
  - Create a .env file in the root directory
     - Add the following configuration:
-        - DB_URI={your mongodb uri} // e.g. mongodb://localhost:27017/
+        - DB_URI={your mongodb uri} e.g. mongodb://localhost:27017/
         - PORT={the port number you will serve the express app on} e.g. 1337
         - LOG_PATH={the path to your log file} e.g. ./logs/auth.log
 - Create your logs Directory as above
@@ -180,6 +180,24 @@ Returns:
     - 401 Unauthorised
     - 403 Account disabled, contact your system administrator
     - 404 Not found
+    - 500 Internal error message
+```
+
+### Authenticate
+```
+POST http://localhost:1337/auth/api/0.1/authenticate
+
+Requires JSON Header:
+    {
+        idToken: 'the given IdToken'
+    }
+
+Returns: 
+    - 200 OK
+    - 400 Bad request - validation failure
+    - 401 Unauthorised
+    - 404 Unauthorised
+    - 403 Account disabled, contact your system administrator
     - 500 Internal error message
 ```
 

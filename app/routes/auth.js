@@ -111,7 +111,13 @@ module.exports = (app) => {
         });
     });
 
-    app.patch('/' + application + '/api/' + version + '/authenticate', (req, res) => {
-        //just check the token is valid and return the user ID?
+    app.post('/' + application + '/api/' + version + '/authenticate', (req, res) => {
+        auth.testToken(req, (err, token) => {
+            res.set('Content-Type', 'application/json');
+            if(err)
+                res.status(err.status).send(err);
+            else
+                res.status(token.status).send(token);
+        });
     });
 }

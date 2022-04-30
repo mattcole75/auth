@@ -44,6 +44,10 @@ const patchUserPasswordRules = {
     password: value => value.length === 64
 }
 
+const testTokenRules = {
+    idtoken: value => value.length === 256
+}
+
 module.exports = {
     postUserRules: postUserRules,
     postLoginRules: postLoginRules,
@@ -52,5 +56,6 @@ module.exports = {
     getTokenRules: getTokenRules,
     patchUserDisplayNameRules: patchUserDisplayNameRules,
     patchUserEmailRules: patchUserEmailRules,
-    patchUserPasswordRules: patchUserPasswordRules
+    patchUserPasswordRules: patchUserPasswordRules,
+    testTokenRules: testTokenRules
 }

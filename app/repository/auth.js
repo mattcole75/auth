@@ -143,6 +143,24 @@ const patchUser = (req, next) => {
     }));
 }
 
+const testToken = (req, next) => {
+
+    const dbConnect = database.getDb();
+
+    dbConnect
+        .collection('user')
+        .findOne({ idToken: req.idtoken }, ((err, res) => {
+            if(err)
+                next({ status: 500, msg: err }, null);
+            else if(!res)
+                next({status: 404, msg: "Not found"}, null);
+            else if(res.inuse === false)
+                next({status: 403, msg: "Account disabled, contact your system administrator"}, null);
+            else
+                next(null, {status: 200, msg: 'OK'});
+        }));
+}
+
 module.exports = {
     postUser: postUser,
     authenticate: authenticate,
@@ -150,5 +168,6 @@ module.exports = {
     getUser: getUser,
     removeToken: removeToken,
     isAuthenticated: isAuthenticated,
-    patchUser: patchUser
+    patchUser: patchUser,
+    testToken: testToken
 }
