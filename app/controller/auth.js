@@ -231,7 +231,7 @@ const patchUserPassword = (req, next) => {
     }
 }
 
-const testToken = (req, next) => {
+const approveTransaction = (req, next) => {
 
     let errors = [];
     if(req.headers.idtoken && req.headers.idtoken != null) {
@@ -245,7 +245,7 @@ const testToken = (req, next) => {
         log.error(`POST v${version} - validation failure - testToken - status: 400, msg: ${errors}`);
         next({status: 400, msg: 'Bad request - validation failure'}, null);
     } else {
-        auth.testToken(req.headers, (err, res) => {
+        auth.approveTransaction(req.headers, (err, res) => {
             if(err) {
                 log.error(`POST v${version} - failed - testToken - status: ${err.status} msg: ${err.msg}`);
                 next(err, null);
@@ -265,5 +265,5 @@ module.exports = {
     patchUserDisplayName: patchUserDisplayName,
     patchUserEmail: patchUserEmail,
     patchUserPassword: patchUserPassword,
-    testToken: testToken
+    approveTransaction: approveTransaction
 }

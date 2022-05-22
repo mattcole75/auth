@@ -3,13 +3,11 @@
 // Date created: 2022-04-23
 // Change history:
 //  1. 
-
 const express = require('express');
 const config = require('./config');
 const application = config.get('application');
 const version = config.get('version');
 const morgan = require('morgan');
-
 
 const allowCrossOriginRequests = (req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');

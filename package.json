@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "auth": "node server.js",
-    "test": "jest"
+    "test": "echo 'db.user.remove({})' | mongo auth && jest"
   },
   "keywords": [
     "Authentication"

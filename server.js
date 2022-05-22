@@ -25,7 +25,7 @@ database.connectToServer((err) => {
         process.exit();
     } else {
         app.listen(PORT, () => {
-            console.log(application + ` server is running on port: ${PORT}`);
+            console.log(application + ` api is running on port: ${PORT}`);
         });
     }
 });

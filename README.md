@@ -16,8 +16,7 @@ npm install
         - LOG_PATH={the path to your log file} e.g. ./logs/auth.log
 - Create your logs Directory as above
 - Take a look at the config file in the configuration directory as this information is used in the URL's
-
-## Usage
+- Create a unique index on the email field in the user collection
 
 ## Data requirements
 ```
@@ -28,7 +27,7 @@ npm install
     - idToken: 128 random bytes hex
 
 ```
-
+## Usage
 ### POST Create new user:
 
 ```
@@ -202,4 +201,4 @@ Returns:
 ```
 
 ## License
-[GNU Affero General Public License v3.0](https://choosealicense.com/licenses/agpl-3.0/)
+[GNU GENERAL PUBLIC LICENSE V3](https://www.gnu.org/licenses/gpl-3.0.en.html)

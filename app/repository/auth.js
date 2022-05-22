@@ -143,7 +143,7 @@ const patchUser = (req, next) => {
     }));
 }
 
-const testToken = (req, next) => {
+const approveTransaction = (req, next) => {
 
     const dbConnect = database.getDb();
 
@@ -169,5 +169,5 @@ module.exports = {
     removeToken: removeToken,
     isAuthenticated: isAuthenticated,
     patchUser: patchUser,
-    testToken: testToken
+    approveTransaction: approveTransaction
 }

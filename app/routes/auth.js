@@ -111,8 +111,8 @@ module.exports = (app) => {
         });
     });
 
-    app.post('/' + application + '/api/' + version + '/authenticate', (req, res) => {
-        auth.testToken(req, (err, token) => {
+    app.post('/' + application + '/api/' + version + '/approvetransaction', (req, res) => {
+        auth.approveTransaction(req, (err, token) => {
             res.set('Content-Type', 'application/json');
             if(err)
                 res.status(err.status).send(err);
