@@ -20,6 +20,10 @@ const config = convict({
             type: String,
             default: process.env.DB_URI
         }
+    },
+    adminEmail: {
+        type: String,
+        default: process.env.ADMIN
     }
 });
 

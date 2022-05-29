@@ -33,7 +33,7 @@ const users = [
             displayName: 'Fitz Farseer',
             email: 'fitz.farseer@system.com',
             password: 'letmein',
-            role: ['super user'],
+            role: ['user', 'super user'],
             localId: '',
             idToken: ''
         },
@@ -42,7 +42,7 @@ const users = [
             displayName: 'Tony Ezekiel',
             email: 'tony.ezekiel@system.com',
             password: 'letmein',
-            role: ['super user'],
+            role: ['user', 'super user'],
             localId: '',
             idToken: ''
         },
@@ -60,7 +60,7 @@ const users = [
             displayName: 'Malta Vestrit',
             email: 'malta.vestrit@system.com',
             password: 'letmein',
-            role: ['administrator'],
+            role: ['user', 'administrator'],
             localId: '',
             idToken: ''
         },
@@ -78,7 +78,7 @@ const users = [
             displayName: 'Kyle Haven',
             email: 'kyle.haven@system.com',
             password: 'letmein',
-            role: ['administrator'],
+            role: ['user', 'administrator'],
             localId: '',
             idToken: ''
         },
@@ -87,7 +87,7 @@ const users = [
             displayName: 'sysadmin',
             email: 'mcole.uk@gmail.com',
             password: 'letmein',
-            role: ['administrator'],
+            role: ['user', 'administrator'],
             localId: '',
             idToken: ''
         }

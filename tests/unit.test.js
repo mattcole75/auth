@@ -66,7 +66,7 @@ describe('Log each user in, get their data and logout:', () => {
 
     goodUsers.forEach(user => {
 
-        it('should successfully return the users details for: ' + user.displayName, async () => {
+        it('should, successfully return the users details for: ' + user.displayName, async () => {
             await endPoint.get('/user')
                 .set({
                     idToken: user.idToken,
@@ -86,6 +86,53 @@ describe('Log each user in, get their data and logout:', () => {
 
     goodUsers.forEach(user => {
 
+        if(user.role.includes('administrator')) {
+            
+            let role = user.role;
+
+            it('should, elevate specified users to the administrator role', async () => {
+                await endPoint.patch('/user/role')
+                    .set({
+                        idToken: goodUsers[9].idToken,
+                        localId: goodUsers[9].localId
+                    })
+                    .set('Accept', 'application/json')
+                    .send({
+                        idToken: user.idToken,
+                        localId: user.localId,
+                        role: role
+                    })
+                    .expect('Content-Type', /json/)
+                    .then(res => {
+                        expect(res.body.status).toBe(200);
+                    })
+            });
+        }
+    });
+
+    goodUsers.forEach(user => {
+
+        it('should, return all registered users but only for an administrator role', async () => {
+            await endPoint.get('/users')
+                .set({
+                    idToken: user.idToken,
+                    localId: user.localId
+                })
+                .set('Accept', 'application/json')
+                .expect('Content-Type', /json/)
+                .then(res => {
+                    if(user.role.includes('administrator')){
+                        // console.log(res.body);
+                        expect(res.body.status).toBe(200);
+                    } else {
+                        expect(res.body.status).toBe(403);
+                    }
+                })
+        });
+    });
+
+    goodUsers.forEach(user => {
+
         it('should, logout: ' + user.displayName, async() => {
             await endPoint.post('/user/logout')
                 .set({
@@ -95,8 +142,9 @@ describe('Log each user in, get their data and logout:', () => {
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
                 .expect(200)
-            });
         });
+    });
+
 });
     
 describe('Deny access tests:', () => {
@@ -282,7 +330,7 @@ describe('Test the user update functionality', () => {
             })
     });
 
-    it('should fail to update the display name given a non valid display name', async () => {
+    it('should, fail to update the display name given a non valid display name', async () => {
         await endPoint.patch('/user/displayname')
             .set({
                 localId: goodUsers[0].localId,
@@ -300,7 +348,7 @@ describe('Test the user update functionality', () => {
             })
     });
 
-    it('should update the display name', async() => {
+    it('should, update the display name', async() => {
         await endPoint.patch('/user/displayname')
             .set({
                 localId: goodUsers[0].localId,
@@ -332,7 +380,7 @@ describe('Test the user update functionality', () => {
             })
     });
 
-    it('should update the email adress', async () => {
+    it('should, update the email adress', async () => {
         await endPoint.patch('/user/email')
             .set({
                 localId: goodUsers[0].localId,
@@ -346,7 +394,7 @@ describe('Test the user update functionality', () => {
             .expect(200)
     });
 
-    it('should fail to update the password given a non valid password', async () => {
+    it('should, fail to update the password given a non valid password', async () => {
         await endPoint.patch('/user/password')
             .set({
                 localId: goodUsers[0].localId,
@@ -364,7 +412,7 @@ describe('Test the user update functionality', () => {
             })
     });
 
-    it('should update the password', async () => {
+    it('should, update the password', async () => {
         await endPoint.patch('/user/password')
             .set({
                 localId: goodUsers[0].localId,
@@ -462,6 +510,12 @@ describe('Authorise transaction tests', () => {
             .set({
                 idToken: wrongToken
             })
+            .send({
+                rules: {
+                    roles: ['user'],
+                    allowSameUser: true
+                }
+            })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(404)
@@ -472,6 +526,12 @@ describe('Authorise transaction tests', () => {
             .set({
                 idToken: ''
             })
+            .send({
+                rules: {
+                    roles: ['user'],
+                    allowSameUser: true
+                }
+            })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(400)
@@ -481,6 +541,12 @@ describe('Authorise transaction tests', () => {
         await endPoint.post('/approvetransaction')
             .set({
             
+            })
+            .send({
+                rules: {
+                    roles: ['user'],
+                    allowSameUser: true
+                }
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
@@ -512,9 +578,30 @@ describe('Authorise transaction tests', () => {
             .set({
                 idToken: goodUsers[1].idToken
             })
+            .send({
+                rules: {
+                    roles: ['user'],
+                    allowSameUser: true
+                }
+            })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200)
+    });
+
+    it('should, return 403 for a valid token but no role permission', async () => {
+        await endPoint.post('/approvetransaction')
+            .set({
+                idToken: goodUsers[1].idToken
+            })
+            .send({
+                rules: {
+                    roles: ['user', 'administrator']
+                }
+            })
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(403)
     });
 
     it('should, logout the user given the user id', async () => {
@@ -532,6 +619,12 @@ describe('Authorise transaction tests', () => {
         await endPoint.post('/approvetransaction')
             .set({
                 idToken: goodUsers[1].idToken
+            })
+            .send({
+                rules: {
+                    roles: ['user'],
+                    allowSameUser: true
+                }
             })
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)

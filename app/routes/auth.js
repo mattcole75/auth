@@ -12,6 +12,7 @@ const auth = require('../controller/auth');
 module.exports = (app) => {
 
     app.post('/' + application + '/api/' + version + '/user', (req, res) => {
+        
         auth.postUser(req, (err, user) => {
             res.set('Content-Type', 'application/json');
             if(err)
@@ -22,6 +23,7 @@ module.exports = (app) => {
     });
 
     app.post('/' + application + '/api/' + version + '/user/login', (req, res) => {
+
         auth.login(req, (err, auth) => {
             res.set('Content-Type', 'application/json');
             if(err)
@@ -32,8 +34,15 @@ module.exports = (app) => {
     });
 
     app.get('/' + application + '/api/' + version + '/user', (req, res) => {
+
         res.set('Content-Type', 'application/json');
-        auth.isAuthenticated(req, (err) => {
+
+        const rules = {
+            roles: ['user', 'administrator'],
+            allowSameUser: true
+        }
+
+        auth.isAuthenticated(req, rules, (err) => {
             if(err)
                 res.status(err.status).send(err);
             else {
@@ -47,9 +56,38 @@ module.exports = (app) => {
         });
     });
 
-    app.post('/' + application + '/api/' + version + '/user/logout', (req, res) => {
+    app.get('/' + application + '/api/' + version + '/users', (req, res) => {
+
         res.set('Content-Type', 'application/json');
-        auth.isAuthenticated(req, (err) => {
+
+        const rules = {
+            roles: ['user', 'administrator']
+        }
+
+        auth.isAuthenticated(req, rules, (err) => {
+            if(err)
+                res.status(err.status).send(err);
+            else {
+                auth.getUsers(req, (err, users) => {
+                    if(err)
+                        res.status(err.status).send(err);
+                    else
+                        res.status(users.status).send(users);
+                });
+            }
+        });
+    });
+
+    app.post('/' + application + '/api/' + version + '/user/logout', (req, res) => {
+
+        res.set('Content-Type', 'application/json');
+
+        const rules = {
+            roles: ['user', 'administrator'],
+            allowSameUser: true
+        }
+
+        auth.isAuthenticated(req, rules, (err) => {
             if(err)
                 res.status(err.status).send(err);
             else {
@@ -64,8 +102,15 @@ module.exports = (app) => {
     });
 
     app.patch('/' + application + '/api/' + version + '/user/displayname', (req, res) => {
+
         res.set('Content-Type', 'application/json');
-        auth.isAuthenticated(req, (err) => {
+
+        const rules = {
+            roles: ['user', 'administrator'],
+            allowSameUser: true
+        }
+
+        auth.isAuthenticated(req, rules, (err) => {
             if(err)
                 res.status(err.status).send(err);
             else {
@@ -80,8 +125,15 @@ module.exports = (app) => {
     });
 
     app.patch('/' + application + '/api/' + version + '/user/email', (req, res) => {
+
         res.set('Content-Type', 'application/json');
-        auth.isAuthenticated(req, (err) => {
+
+        const rules = {
+            roles: ['user', 'administrator'],
+            allowSameUser: true
+        }
+
+        auth.isAuthenticated(req, rules, (err) => {
             if(err)
                 res.status(err.status).send(err);
             else {
@@ -96,8 +148,15 @@ module.exports = (app) => {
     });
 
     app.patch('/' + application + '/api/' + version + '/user/password', (req, res) => {
+
         res.set('Content-Type', 'application/json');
-        auth.isAuthenticated(req, (err) => {
+
+        const rules = {
+            roles: ['user', 'administrator'],
+            allowSameUser: true
+        }
+
+        auth.isAuthenticated(req, rules, (err) => {
             if(err)
                 res.status(err.status).send(err);
             else {
@@ -111,7 +170,33 @@ module.exports = (app) => {
         });
     });
 
+    app.patch('/' + application + '/api/' + version + '/user/role', (req, res) => {
+
+        res.set('Content-Type', 'application/json');
+
+        const rules = {
+            roles: ['user', 'administrator']
+        }
+
+        auth.isAuthenticated(req, rules, (err) => {
+            if(err)
+                res.status(err.status).send(err);
+            else {
+                auth.patchUserRole(req, (err, user) => {
+                    if(err)
+                        res.status(err.status).send(err);
+                    else
+                        res.status(user.status).send(user);
+                });
+            }
+        });
+    });
+
     app.post('/' + application + '/api/' + version + '/approvetransaction', (req, res) => {
+
+        // will not authenticate user as the function is only checking the token
+        // must check the rules of the requesting API endpoint
+        
         auth.approveTransaction(req, (err, token) => {
             res.set('Content-Type', 'application/json');
             if(err)

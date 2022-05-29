@@ -44,6 +44,12 @@ const patchUserPasswordRules = {
     password: value => value.length === 64
 }
 
+const patchUserRoleRules = {
+    localId: value => ObjectId.isValid(value),
+    idToken: value => value.length === 256,
+    role: value => value.constructor === Array
+}
+
 const testTokenRules = {
     idtoken: value => value.length === 256
 }
@@ -57,5 +63,6 @@ module.exports = {
     patchUserDisplayNameRules: patchUserDisplayNameRules,
     patchUserEmailRules: patchUserEmailRules,
     patchUserPasswordRules: patchUserPasswordRules,
+    patchUserRoleRules: patchUserRoleRules,
     testTokenRules: testTokenRules
 }
