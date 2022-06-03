@@ -46,8 +46,35 @@ const postUser = (req, next) => {
                 next(err, null);
             }
             else {
+                auth.authenticate(req.body, (err, result) => {
+                    if(err) {
+                        log.error(`POST v${version} - failed - login - status: 400, msg: ${err.msg}`);
+                        next(err, null);
+                    } else {
+                        const params = { localId: result.data._id, idToken: genToken(), lastLoggedIn: moment().format()};
+                        auth.patchToken(params, (err, idToken) => {
+                            if(err) {
+                                log.error(`POST v${version} - failed - login - status: ${err.status} msg: ${err.msg}`);
+                                next(err, null);
+                            } else {
+                                next(null, {
+                                    status: user.status,
+                                    user: {
+                                        localId: result.data._id,
+                                        displayName: result.data.displayName,
+                                        email: result.data.email,
+                                        idToken: idToken.idToken,
+                                        expiresIn: 3600
+                                    }
+                                });
+                            }
+                        });
+        
+                    }
+                });
+
                 // log.info(`POST v${version} - success - postuser - status: ${user.status}`);
-                next(null, user);
+                //next(null, user);
             }
         });
     }
@@ -58,7 +85,7 @@ const login = (req, next) => {
     const errors = validate(req.body, postLoginRules);
 
     if(errors.length > 0) {
-        log.error(`POST v${version} - validation failure - login - status: ${err.status} msg: ${errors}`);
+        log.error(`POST v${version} - validation failure - login - status: 400 msg: ${errors}`);
         next({status: 400, msg: 'Bad request - validation failure'}, null);
     } else {
         auth.authenticate(req.body, (err, result) => {

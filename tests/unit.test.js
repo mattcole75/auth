@@ -32,9 +32,11 @@ describe('Create system users:', () => {
                 .then(res => {
                     expect(res.body).toBeDefined();
                     expect(res.body.status).toBe(201);
-                    expect(res.body.data.acknowledged === true)
-                    expect(res.body.data.insertedId)
-                    user.localId = res.body.data.insertedId
+                    expect(res.body.user.displayName).toBe(user.displayName);
+                    expect(res.body.user.email).toBe(user.email);
+                    expect(res.body.user.idToken).toHaveLength(256);
+                    user.localId = res.body.user.localId;
+                    user.idToken = res.body.user.idToken; 
                 })
         });
     });
