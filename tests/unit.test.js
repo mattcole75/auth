@@ -1,13 +1,10 @@
-// Description: Jest tests to support a TDD development approach
-// Developer: Matt Cole
-// Date created: 2022-01-29
-// Change history:
-//  1. 
-
 const endPoint = require('./endPoint');
 const crypto = require('crypto');
 const goodUsers = require('./data/good.user.data');
 const badUsers = require('./data/bad.user.data');
+const config = require('../configuration/config');
+const application = config.get('application');
+const version = config.get('version');
 
 let localId1 = null;
 let idToken1 = null;
@@ -20,7 +17,7 @@ describe('Create system users:', () => {
     goodUsers.forEach(user => {
 
         it('should, create a user account for: ' + user.displayName, async () => {
-            await endPoint.post('/user')
+            await endPoint.post(application + '/api/' + version + '/user')
                 .send({
                     displayName: user.displayName,
                     email: user.email,
@@ -46,7 +43,7 @@ describe('Log each user in, get their data and logout:', () => {
 
     goodUsers.forEach(user => {
         it('should, login and return the user details and token for: ' + user.displayName, async () => {
-            await endPoint.post('/user/login')
+            await endPoint.post(application + '/api/' + version + '/user/login')
                 .send({
                     email: user.email,
                     password: crypto.createHash('sha256').update(user.password).digest('hex')
@@ -69,7 +66,7 @@ describe('Log each user in, get their data and logout:', () => {
     goodUsers.forEach(user => {
 
         it('should, successfully return the users details for: ' + user.displayName, async () => {
-            await endPoint.get('/user')
+            await endPoint.get(application + '/api/' + version + '/user')
                 .set({
                     idToken: user.idToken,
                     localId: user.localId
@@ -93,7 +90,7 @@ describe('Log each user in, get their data and logout:', () => {
             let role = user.role;
 
             it('should, elevate specified users to the administrator role', async () => {
-                await endPoint.patch('/user/role')
+                await endPoint.patch(application + '/api/' + version + '/user/role')
                     .set({
                         idToken: goodUsers[9].idToken,
                         localId: goodUsers[9].localId
@@ -115,7 +112,7 @@ describe('Log each user in, get their data and logout:', () => {
     goodUsers.forEach(user => {
 
         it('should, return all registered users but only for an administrator role', async () => {
-            await endPoint.get('/users')
+            await endPoint.get(application + '/api/' + version + '/users')
                 .set({
                     idToken: user.idToken,
                     localId: user.localId
@@ -136,7 +133,7 @@ describe('Log each user in, get their data and logout:', () => {
     goodUsers.forEach(user => {
 
         it('should, logout: ' + user.displayName, async() => {
-            await endPoint.post('/user/logout')
+            await endPoint.post(application + '/api/' + version + '/user/logout')
                 .set({
                     idToken: user.idToken,
                     localId: user.localId
@@ -152,7 +149,7 @@ describe('Log each user in, get their data and logout:', () => {
 describe('Deny access tests:', () => {
 
     it('should, deny access for incorrect email address', async () => {
-        await endPoint.post('/user/login')
+        await endPoint.post(application + '/api/' + version + '/user/login')
             .send({
                 email: badUsers[0].email,
                 password: crypto.createHash('sha256').update(badUsers[0].password).digest('hex')
@@ -168,7 +165,7 @@ describe('Deny access tests:', () => {
     });
 
     it('should, deny access for incorrect password', async () => {
-        await endPoint.post('/user/login')
+        await endPoint.post(application + '/api/' + version + '/user/login')
             .send({
                 email: badUsers[1].email,
                 password: crypto.createHash('sha256').update(badUsers[1].password).digest('hex')
@@ -184,7 +181,7 @@ describe('Deny access tests:', () => {
     });
 
     it('should, deny access for incorrect email and password', async () => {
-        await endPoint.post('/user/login')
+        await endPoint.post(application + '/api/' + version + '/user/login')
             .send({
                 email: badUsers[2].email,
                 password: crypto.createHash('sha256').update(badUsers[2].password).digest('hex')
@@ -200,7 +197,7 @@ describe('Deny access tests:', () => {
     });
 
     it('should, login a valid user for further testing', async () => {
-        await endPoint.post('/user/login')
+        await endPoint.post(application + '/api/' + version + '/user/login')
             .send({
                 email: badUsers[3].email,
                 password: crypto.createHash('sha256').update(badUsers[3].password).digest('hex')
@@ -220,7 +217,7 @@ describe('Deny access tests:', () => {
     });
 
     it('should, fail to return user data, given a loged in user but with invadid token', async () => {
-        await endPoint.get('/user')
+        await endPoint.get(application + '/api/' + version + '/user')
             .set({
                 idToken: wrongToken,
                 localId: badUsers[3].localId
@@ -236,7 +233,7 @@ describe('Deny access tests:', () => {
     });
 
     it('should, fail to return user data, given a loged in user but with invadid localId', async () => {
-        await endPoint.get('/user')
+        await endPoint.get(application + '/api/' + version + '/user')
             .set({
                 idToken: badUsers[3].idToken,
                 localId: '1234567890'
@@ -252,7 +249,7 @@ describe('Deny access tests:', () => {
     });
 
     it('should, fail to return the users details given no headers', async() => {
-        await endPoint.get('/user')
+        await endPoint.get(application + '/api/' + version + '/user')
             .set({
                 
             })
@@ -262,7 +259,7 @@ describe('Deny access tests:', () => {
     });
 
     it('should, fail to return the users details given null token', async () => {
-        await endPoint.get('/user')
+        await endPoint.get(application + '/api/' + version + '/user')
             .set({
                 idToken: null,
                 localId: badUsers[3].localId
@@ -273,7 +270,7 @@ describe('Deny access tests:', () => {
     });
 
     it('should, fail to return the users details given an empty token', async () => {
-        await endPoint.get('/user')
+        await endPoint.get(application + '/api/' + version + '/user')
             .set({
                 idToken: '',
                 localId: badUsers[3].localId
@@ -284,7 +281,7 @@ describe('Deny access tests:', () => {
     });
 
     it('should, fail to create a user with an already registered email address', async () => {
-        await endPoint.post('/user')
+        await endPoint.post(application + '/api/' + version + '/user')
             .send({
                 displayName: goodUsers[0].displayName,
                 email: goodUsers[0].email,
@@ -298,7 +295,7 @@ describe('Deny access tests:', () => {
     });
 
     it('should, logout the user given the user id', async () => {
-        await endPoint.post('/user/logout')
+        await endPoint.post(application + '/api/' + version + '/user/logout')
             .set({
                 idToken: badUsers[3].idToken,
                 localId: badUsers[3].localId
@@ -313,7 +310,7 @@ describe('Deny access tests:', () => {
 describe('Test the user update functionality', () => {
 
     it('should, login a valid user for further testing', async () => {
-        await endPoint.post('/user/login')
+        await endPoint.post(application + '/api/' + version + '/user/login')
             .send({
                 email: goodUsers[0].email,
                 password: crypto.createHash('sha256').update(goodUsers[0].password).digest('hex')
@@ -333,7 +330,7 @@ describe('Test the user update functionality', () => {
     });
 
     it('should, fail to update the display name given a non valid display name', async () => {
-        await endPoint.patch('/user/displayname')
+        await endPoint.patch(application + '/api/' + version + '/user/displayname')
             .set({
                 localId: goodUsers[0].localId,
                 idToken: goodUsers[0].idToken
@@ -351,7 +348,7 @@ describe('Test the user update functionality', () => {
     });
 
     it('should, update the display name', async() => {
-        await endPoint.patch('/user/displayname')
+        await endPoint.patch(application + '/api/' + version + '/user/displayname')
             .set({
                 localId: goodUsers[0].localId,
                 idToken: goodUsers[0].idToken
@@ -365,7 +362,7 @@ describe('Test the user update functionality', () => {
     });
 
     it('should, fail to update the email adress given an invadid email address', async () => {
-        await endPoint.patch('/user/email')
+        await endPoint.patch(application + '/api/' + version + '/user/email')
             .set({
                 localId: goodUsers[0].localId,
                 idToken: goodUsers[0].idToken
@@ -383,7 +380,7 @@ describe('Test the user update functionality', () => {
     });
 
     it('should, update the email adress', async () => {
-        await endPoint.patch('/user/email')
+        await endPoint.patch(application + '/api/' + version + '/user/email')
             .set({
                 localId: goodUsers[0].localId,
                 idToken: goodUsers[0].idToken
@@ -397,7 +394,7 @@ describe('Test the user update functionality', () => {
     });
 
     it('should, fail to update the password given a non valid password', async () => {
-        await endPoint.patch('/user/password')
+        await endPoint.patch(application + '/api/' + version + '/user/password')
             .set({
                 localId: goodUsers[0].localId,
                 idToken: goodUsers[0].idToken
@@ -415,7 +412,7 @@ describe('Test the user update functionality', () => {
     });
 
     it('should, update the password', async () => {
-        await endPoint.patch('/user/password')
+        await endPoint.patch(application + '/api/' + version + '/user/password')
             .set({
                 localId: goodUsers[0].localId,
                 idToken: goodUsers[0].idToken
@@ -438,7 +435,7 @@ describe('Test the user update functionality', () => {
     // });
 
     it('should, logout the user given the user id', async () => {
-        await endPoint.post('/user/logout')
+        await endPoint.post(application + '/api/' + version + '/user/logout')
             .set({
                 idToken: goodUsers[0].idToken,
                 localId: goodUsers[0].localId
@@ -454,7 +451,7 @@ describe('Test the user update functionality', () => {
 describe('Test the user input validators', () => {
 
     it('should, fail validation for missing @', async done => {
-        await endPoint.post('/user')
+        await endPoint.post(application + '/api/' + version + '/user')
             .send({
                 displayName: "Test",
                 email: 'testphobos.com',
@@ -471,7 +468,7 @@ describe('Test the user input validators', () => {
     });
 
     it('should, fail validation for a display name > 50 chars', async () => {
-        await endPoint.post('/user')
+        await endPoint.post(application + '/api/' + version + '/user')
             .send({
                 displayName: "123456789012345678901234567890123456789012345678901",
                 email: 'test@phobos.com',
@@ -487,7 +484,7 @@ describe('Test the user input validators', () => {
     });
 
     it('should, fail validation for a display name > 50 chars and email missing @', async () => {
-        await endPoint.post('/user')
+        await endPoint.post(application + '/api/' + version + '/user')
             .send({
                 displayName: "123456789012345678901234567890123456789012345678901",
                 email: 'testphobos.com',
@@ -508,7 +505,7 @@ describe('Test the user input validators', () => {
 describe('Authorise transaction tests', () => {
 
     it('should, return 404 for a non-existing', async () => {
-        await endPoint.post('/approvetransaction')
+        await endPoint.post(application + '/api/' + version + '/approvetransaction')
             .set({
                 idToken: wrongToken
             })
@@ -524,7 +521,7 @@ describe('Authorise transaction tests', () => {
     });
 
     it('should, return 400 for an empty string token', async () => {
-        await endPoint.post('/approvetransaction')
+        await endPoint.post(application + '/api/' + version + '/approvetransaction')
             .set({
                 idToken: ''
             })
@@ -540,7 +537,7 @@ describe('Authorise transaction tests', () => {
     });
 
     it('should, return 400 for no token', async () => {
-        await endPoint.post('/approvetransaction')
+        await endPoint.post(application + '/api/' + version + '/approvetransaction')
             .set({
             
             })
@@ -556,7 +553,7 @@ describe('Authorise transaction tests', () => {
     });
 
     it('should, login a valid user for further testing', async () => {
-        await endPoint.post('/user/login')
+        await endPoint.post(application + '/api/' + version + '/user/login')
             .send({
                 email: goodUsers[1].email,
                 password: crypto.createHash('sha256').update(goodUsers[1].password).digest('hex')
@@ -576,7 +573,7 @@ describe('Authorise transaction tests', () => {
     });
 
     it('should, return 200 for a valid token', async () => {
-        await endPoint.post('/approvetransaction')
+        await endPoint.post(application + '/api/' + version + '/approvetransaction')
             .set({
                 idToken: goodUsers[1].idToken
             })
@@ -592,7 +589,7 @@ describe('Authorise transaction tests', () => {
     });
 
     it('should, return 403 for a valid token but no role permission', async () => {
-        await endPoint.post('/approvetransaction')
+        await endPoint.post(application + '/api/' + version + '/approvetransaction')
             .set({
                 idToken: goodUsers[1].idToken
             })
@@ -607,7 +604,7 @@ describe('Authorise transaction tests', () => {
     });
 
     it('should, logout the user given the user id', async () => {
-        await endPoint.post('/user/logout')
+        await endPoint.post(application + '/api/' + version + '/user/logout')
             .set({
                 idToken: goodUsers[1].idToken,
                 localId: goodUsers[1].localId
@@ -618,7 +615,7 @@ describe('Authorise transaction tests', () => {
     });
 
     it('should, return 404 for a logged out user', async () => {
-        await endPoint.post('/approvetransaction')
+        await endPoint.post(application + '/api/' + version + '/approvetransaction')
             .set({
                 idToken: goodUsers[1].idToken
             })
@@ -631,5 +628,34 @@ describe('Authorise transaction tests', () => {
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(404)
+    });
+});
+
+describe('Bug replication and fixes', () => {
+
+    it('should return 200 server is up', async () => {
+        await endPoint.get('')
+        .set('Accept', 'application/json')
+        .expect(200)
+        .then(res => {
+            expect(res.body.msg).toBe('Server is up!');
+        })
+    });
+
+    // monitoring the logs on the live server and clocked this request... someone trying to hack the system? 
+    it('should return 404 Not Found', async () => {
+        await endPoint.get('.env')
+        .expect(404)
+        .then(res => {
+            expect(res.res.statusMessage).toBe('Not Found');
+        })
+    });
+
+    it('should return 404 Not Found', async () => {
+        await endPoint.get('/index.html')
+        .expect(404)
+        .then(res => {
+            expect(res.res.statusMessage).toBe('Not Found');
+        })
     });
 });

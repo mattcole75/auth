@@ -1,9 +1,3 @@
-// Description: the configuration file for the data validator for all supported applications
-// Developer: Matt Cole
-// Date created: 2022-01-29
-// Change history:
-//  1. 
-
 const { ObjectId } = require('mongodb');
 
 const postUserRules = {

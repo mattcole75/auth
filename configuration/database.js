@@ -1,10 +1,3 @@
-// Description: a function to initiate a Mongo database connection
-// Developer: Matt Cole
-// Date created: 2022-04-18
-// note: sudo service mongod start
-// Change history:
-//  1. 
-
 const { MongoClient } = require('mongodb');
 const config = require('./config');
 const connectionString = config.get('db.uri');

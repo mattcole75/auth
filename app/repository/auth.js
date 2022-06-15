@@ -1,9 +1,3 @@
-// Description: Provides the repository for the auth app
-// Developer: Matt Cole
-// Date created: 2022-04-23
-// Change history:
-//  1. 
-
 const { ObjectId } = require('mongodb');
 const database = require('../../configuration/database');
 const { genHash } = require('../../utility/auth');
